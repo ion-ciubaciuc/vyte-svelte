@@ -2,6 +2,7 @@
     import dayjs from 'dayjs';
     import { onMount } from 'svelte';
     import Client from './Client';
+    import Divider from './Divider.svelte';
     import Loading from './Loading.svelte';
     import DaySlots from './DaySlots.svelte';
     import DayPicker from './DayPicker.svelte';
@@ -52,25 +53,21 @@
     let days: string[];
     let slotsForDays: Record<string, TimeSlot[]>;
 
+    const formatDays = (startDate: string, nrOfDays: number) => {
+        const start = dayjs(startDate);
+        return Array.from({ length: nrOfDays }).map((_, i) =>
+            start.add(i, 'days').format('YYYY-MM-DD')
+        );
+    };
+
     $: endDay = dayjs(startDay)
         .add(ndays - 1, 'days')
         .format('YYYY-MM-DD');
 
-    $: {
-        const _days = [];
-        const start = dayjs(startDay);
-        const format = 'YYYY-MM-DD';
-        _days.push(start.format(format));
-
-        for (let i = 1; i < ndays; i++) {
-            _days.push(start.add(i, 'days').format(format));
-        }
-
-        days = _days;
-    }
+    $: days = formatDays(startDay, ndays);
 
     $: moreSlotsAreAvailable = maxSlots > nrOfSlots;
-    $: nextAvailableDate = nextAvailability?.availableDate
+    $: nextAvailableDate = nextAvailability
         ? dayjs(nextAvailability.availableDate).format('MMMM D, YYYY')
         : '';
 
@@ -79,20 +76,17 @@
         let _maxSlots = 0;
         let _slotsForDays = {} as typeof slotsForDays;
 
-        if (dailySlots) {
-            _days.map((day) => {
-                const daySlots = dailySlots[day];
-                _slotsForDays[day] = [];
-
-                if (daySlots) {
-                    const { slots } = daySlots;
-                    _slotsForDays[day] = slots;
-                    if (slots.length > _maxSlots) {
-                        _maxSlots = slots.length;
-                    }
+        _days.forEach((day) => {
+            const daySlots = dailySlots[day];
+            _slotsForDays[day] = [];
+            if (daySlots) {
+                const { slots } = daySlots;
+                _slotsForDays[day] = slots;
+                if (slots.length > _maxSlots) {
+                    _maxSlots = slots.length;
                 }
-            });
-        }
+            }
+        });
 
         maxSlots = _maxSlots;
         slotsForDays = _slotsForDays;
@@ -146,23 +140,17 @@
 
     const getSlots = () => {
         loading = true;
-        nextAvailability = undefined;
         client
             .list(startDay, endDay)
             .then((data) => {
                 dailySlots = data.days;
-
-                if (data.nextAvailability) {
-                    nextAvailability = data.nextAvailability;
-                    if (startAtFirstAvailability && firstLoad) {
-                        goToNextAvailability();
-                    }
+                nextAvailability = data.nextAvailability;
+                if (startAtFirstAvailability && firstLoad) {
+                    goToNextAvailability();
                 }
-
                 if (firstLoad) {
                     firstLoad = false;
                 }
-
                 if (oneColumn) {
                     checkSelectedDay();
                 }
@@ -202,14 +190,13 @@
                     // this day was already our selected slot
                     return;
                 }
-
                 if (!alternativeDay) {
                     alternativeDay = day;
                 }
             }
         }
 
-        selectedDay = alternativeDay as string; //our selectedDay wasn't one of the loaded days with slots so we pick the best alternative (if any)
+        selectedDay = alternativeDay as string; // our selectedDay wasn't one of the loaded days with slots so we pick the best alternative (if any)
     };
 
     const daySelected = (event: CustomEvent) => {
@@ -256,6 +243,7 @@
             {selectedDay}
         />
     </DaysContainer>
+    <Divider />
     {#if loading}
         <Loading />
     {:else}
@@ -302,10 +290,9 @@
         text-align: center;
         background: #ffffff;
         position: relative;
-    }
-
-    .slot-container > *:first-of-type {
-        border-bottom: 1px solid;
+        border: 1px solid #d8dfe6;
+        border-radius: 4px;
+        box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.25);
     }
 
     .slot-container * {

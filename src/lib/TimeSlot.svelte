@@ -59,7 +59,7 @@
 
     .c-slot-time.selected {
         background: #308ff0;
-        color: white;
+        color: #ffffff;
         font-weight: bold;
     }
 </style>
