@@ -1,13 +1,14 @@
 <script lang="ts">
     import dayjs from 'dayjs';
     import { onMount } from 'svelte';
-    import Client from './Client';
+    import Client from './client';
     import Divider from './Divider.svelte';
     import Loading from './Loading.svelte';
     import DaySlots from './DaySlots.svelte';
     import DayPicker from './DayPicker.svelte';
+    import type { VyteData, Slot } from './client';
     import DaysContainer from './DaysContainer.svelte';
-    import type { VyteData, TimeSlot } from './Client';
+    import NextAppoinment from './NextAppoinment.svelte';
 
     export let duration = 30;
     export let emails = '';
@@ -35,14 +36,14 @@
         return date;
     };
 
-    let dailySlots = {} as VyteData['days'];
+    let dailySlots: VyteData['days'] = {};
     let firstLoad = true;
     let loading = true;
     let maxSlots = 0;
-    let nextAvailability = {} as VyteData['nextAvailability'];
+    let nextAvailability: VyteData['nextAvailability'] = undefined;
     let nrOfSlots = nslots;
     let selectedDay = '';
-    let selectedSlot: TimeSlot | undefined;
+    let selectedSlot: Slot | undefined;
     let startDay = ensureNotPast(start);
     let client: Client;
     let isMounted = false;
@@ -51,7 +52,7 @@
      * The list of days displayed.
      */
     let days: string[];
-    let slotsForDays: Record<string, TimeSlot[]>;
+    let slotsForDays: Record<string, Slot[]>;
 
     const formatDays = (startDate: string, nrOfDays: number) => {
         const start = dayjs(startDate);
@@ -155,9 +156,8 @@
                     checkSelectedDay();
                 }
             })
-            .finally(() => {
-                loading = false;
-            });
+            .catch(console.error)
+            .finally(() => (loading = false));
     };
 
     const changeDays = (direction: number) => {
@@ -180,23 +180,17 @@
     };
 
     const checkSelectedDay = () => {
-        if (!dailySlots) return;
-
-        let alternativeDay;
+        let alternativeDay = '';
         for (const day of days) {
-            if (dailySlots[day]) {
-                // we have at least one slot on that day
-                if (selectedDay === day) {
-                    // this day was already our selected slot
-                    return;
-                }
-                if (!alternativeDay) {
-                    alternativeDay = day;
-                }
-            }
+            // we don't have any slot on this day or it was already selected
+            if (!dailySlots[day] || selectedDay === day) continue;
+            alternativeDay = day;
+            break;
         }
-
-        selectedDay = alternativeDay as string; // our selectedDay wasn't one of the loaded days with slots so we pick the best alternative (if any)
+        // our selectedDay wasn't one of the loaded days with slots so we pick the best alternative (if any)
+        if (alternativeDay) {
+            selectedDay = alternativeDay;
+        }
     };
 
     const daySelected = (event: CustomEvent) => {
@@ -254,14 +248,11 @@
                     {nrOfSlots}
                     {selectedSlot}
                     on:slot-selected={handleSlotSelected}
+                    on:slot-selected
                 />
             {/each}
             {#if nextAvailableDate}
-                <div class="next-day-container">
-                    <button class="next-day" on:click={goToNextAvailability}>
-                        Next appointment on {nextAvailableDate}
-                    </button>
-                </div>
+                <NextAppoinment date={nextAvailableDate} on:click={goToNextAvailability} />
             {/if}
         </DaysContainer>
         {#if moreSlotsAreAvailable}
@@ -273,48 +264,45 @@
 </div>
 
 <style>
-    .next-day-container {
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-    }
-
-    .next-day {
-        cursor: pointer;
-        border-radius: 4px;
-        padding: 8px 10px;
-    }
-
-    .slot-container {
-        text-align: center;
-        background: #ffffff;
-        position: relative;
-        border: 1px solid #d8dfe6;
-        border-radius: 4px;
-        box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.25);
-    }
-
     .slot-container * {
         box-sizing: border-box;
     }
 
+    .slot-container {
+        --button-radius: 4px;
+        --button-padding: 8px 12px;
+        --color-white: #ffffff;
+        --color-blue: #308ff0;
+        --color-black: #464e55;
+        --color-gray: #7b8394;
+        --font-size: 12px;
+
+        text-align: center;
+        position: relative;
+        background: var(--color-white);
+        border: 1px solid #d8dfe6;
+        border-radius: var(--button-radius);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.125);
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode',
+            Geneva, Verdana, sans-serif;
+    }
+
     .slot-footer {
-        background: #ffffff;
         display: flex;
         flex-direction: row;
+        justify-content: center;
+        background: var(--color-white);
+        font-size: var(--font-size);
         padding: 10px 0;
-        width: 100%;
-        font-size: 12px;
         font-weight: 600;
         text-align: center;
-        justify-content: center;
+        width: 100%;
     }
 
     .slot-footer a {
         cursor: pointer;
-        font-size: 12px;
+        font-size: var(--font-size);
         text-decoration: underline;
-        color: #308ff0;
+        color: var(--color-blue);
     }
 </style>

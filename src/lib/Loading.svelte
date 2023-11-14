@@ -16,7 +16,7 @@
         width: 10px;
         height: 10px;
         margin-right: 10px;
-        background-color: #308ff0;
+        background: var(--color-blue);
 
         border-radius: 100%;
         display: inline-block;

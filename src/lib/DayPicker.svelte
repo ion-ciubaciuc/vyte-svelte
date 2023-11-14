@@ -39,9 +39,11 @@
         cursor: pointer;
         position: absolute;
         width: auto;
-        padding: 8px 12px;
+        padding: var(--button-padding);
         border: none;
-        background: transparent;
+        background: none;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     .days-prev {

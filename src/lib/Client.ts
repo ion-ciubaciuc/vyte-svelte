@@ -1,7 +1,7 @@
 const apiBaseUrlPrefix = 'https://api';
 const apiBaseUrlSuffix = '.vyte.in';
 
-export type TimeSlot = {
+export type Slot = {
     start: { dateTime: string };
     end: { dateTime: string };
 };
@@ -12,9 +12,9 @@ export type VyteData = {
     to: string;
     nextAvailability?: {
         availableDate: string;
-        availableSlot: TimeSlot;
+        availableSlot: Slot;
     };
-    days: Record<string, { slots: TimeSlot[] }>;
+    days: Record<string, { slots: Slot[] }>;
 };
 
 export default class Client {
@@ -56,11 +56,9 @@ export default class Client {
     }
 
     getBase() {
-        if (this.env.length > 0 && this.env !== 'prod') {
-            return `${apiBaseUrlPrefix}-${this.env}${apiBaseUrlSuffix}`;
-        }
-
-        return `${apiBaseUrlPrefix}${apiBaseUrlSuffix}`;
+        return this.env.length > 0 && this.env !== 'prod'
+            ? `${apiBaseUrlPrefix}-${this.env}${apiBaseUrlSuffix}`
+            : `${apiBaseUrlPrefix}${apiBaseUrlSuffix}`;
     }
 
     setUrl() {
@@ -71,11 +69,9 @@ export default class Client {
 
         if (this.team) {
             url.searchParams.set('team', this.team);
-
             if (this.teamBooking) {
                 url.searchParams.set('tb', this.teamBooking);
             }
-
             if (this.teamAllMembers) {
                 url.searchParams.set('team_all_members', 'true');
             }
