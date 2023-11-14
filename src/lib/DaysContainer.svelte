@@ -10,6 +10,5 @@
         flex-direction: row;
         padding: 8px max(30px, 5%);
         justify-content: space-around;
-        box-sizing: border-box;
     }
 </style>

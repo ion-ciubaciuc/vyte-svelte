@@ -1,6 +1,6 @@
 <script lang="ts">
     import TimeSlot from './TimeSlot.svelte';
-    import type { TimeSlot as Slot } from './Client';
+    import type { Slot } from './client';
 
     export let nrOfSlots = 10;
     export let slots: Slot[];
@@ -26,7 +26,6 @@
         display: flex;
         gap: 4px;
         flex-direction: column;
-        box-sizing: border-box;
         width: 100%;
     }
 </style>

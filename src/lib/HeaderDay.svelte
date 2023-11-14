@@ -41,43 +41,40 @@
 
 <style>
     .day {
-        cursor: default;
         text-align: center;
         width: 100%;
         display: flex;
         flex-direction: column;
+        font-size: var(--font-size);
         align-items: center;
         padding: 4px 0;
-        border-radius: 4px;
+        border-radius: var(--button-radius);
         border: none;
-        cursor: pointer;
-        background: transparent;
+        background: none;
     }
 
     .day .date-name {
-        font-size: 12px;
         line-height: 1;
-        color: #7b8394;
+        color: var(--color-gray);
     }
 
     .day .date-nb {
-        font-size: 12px;
         font-weight: 600;
-        color: #464e55;
+        color: var(--color-black);
     }
 
     .day.today .date-name,
     .day.today .date-nb {
-        color: #308ff0;
+        color: var(--color-blue);
     }
 
     .day.selected {
-        background: #308ff0;
+        background: var(--color-blue);
     }
 
     .day.selected .date-nb,
     .day.selected .date-name {
-        color: white;
+        color: var(--color-white);
     }
 
     .day.clickable {

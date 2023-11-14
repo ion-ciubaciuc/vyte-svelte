@@ -1,58 +1,73 @@
-# create-svelte
+# Vyte slot picker for Svelte
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This is a ported version of the Vue.js web component to integrate the Vyte slot picker directly in your website. It's fully configurable component with the following props:
 
-Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
+## Properties
 
-## Creating a project
+- `emails`
+    - _Type_: `string`
+    - _Required_: `true`
+    - _Details_: If no users are passed. Email of the person whose availabilities you want to show (Vyte account required). You can pass a list of emails by comma separating them. Slots returned will be slots when all of those users are available.
 
-If you're seeing this, you've probably already done this step. Congrats!
+- `users`
+    - _Type_: `string`
+    - _Required_: `true`
+    - _Details_: If no emails are passed. Vyte `user._id` of the person whose availabilities you want to show (Vyte account required). You can pass a list of user_ids by comma separating them. Slots returned will be slots when all of those users are available.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- `availability`
+    - _Type_: `string`
+    - _Required_: `false`
+    - _Details_: The `_id` of a specific availability you want to use for those slots. This availability could match a specific appointment type, for instance.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- `ndays`
+    - _Type_: `number`
+    - _Details_: Default is 5. Number of days you want the view to show.
 
-## Developing
+- `timezone`
+    - _Type_: `string`
+    - _Required_: `true`
+    - _Details_: The timezone you want the availabilities displayed in. It must be expressed according to [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- `duration`
+    - _Type_: `string`
+    - _Details_: Default is 30. Duration in minutes.
 
-```bash
-npm run dev
+<!-- 
+- `lang`
+  - _Type_: `string`
+  - _Details_: Default is English. Language and locale of the component. It is expressed according to [ISO 639-1](https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1) and the available languages are: `fr`, `en`, `es`, `it`, `pt`, `de`, `sv`, `nl`.
+-->
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- `oneColumn`
+    - _Type_: `boolean`
+    - _Details_: Default is false. If you want the slots to be displayed on 1 column (vs 1 column per day).
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+- `start`
+    - _Type_: `date`
+    - _Details_: Defaults to today. Start date expressed according to [ISO 8601](https://fr.wikipedia.org/wiki/ISO_8601).
 
-## Building
+- `startAtFirstAvailability`
+    - _Type_: `boolean`
+    - _Details_: Default is false. If you want the first date to jump to the first day that has an available slot.
 
-To build your library:
+- `nslots`
+    - _Type_: `number`
+    - _Details_: Number of slots max shown per day by default. The user can then click on a "view more slots" button to see all the slots available.
 
-```bash
-npm run package
-```
 
-To create a production version of your showcase app:
+```html
+<script>
+    import { VyteSlotPicker } from 'vyte-slot-picker-svelte';
 
-```bash
-npm run build
-```
+    const slotSelectedHandler = (event) => {
+        alert(JSON.stringify(event.detail));
+    };
+</script>
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
+<VyteSlotPicker
+    timezone="Europe/Paris"
+    emails="martin@vytein.com"
+    on:slot-selected="{handleSlotSelected}"
+>
+</VyteSlotPicker>
 ```

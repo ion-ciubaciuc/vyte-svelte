@@ -1,7 +1,7 @@
 <script lang="ts">
     import dayjs from 'dayjs';
     import { createEventDispatcher } from 'svelte';
-    import type { TimeSlot as Slot } from './Client';
+    import type { Slot } from './client';
 
     export let useLocale = true;
     export let tslot: Slot | undefined;
@@ -25,41 +25,43 @@
 </script>
 
 {#if tslot}
-    <button class="c-slot-time" on:click={handleClick} class:selected={isSelected}>
+    <button class="slot-time" on:click={handleClick} class:selected={isSelected}>
         {time(tslot.start.dateTime)}
     </button>
 {:else}
-    <div class="c-slot-time unavailable">—</div>
+    <div class="slot-time unavailable">—</div>
 {/if}
 
 <style>
-    .c-slot-time {
+    .slot-time {
+        --bg-color: #edf3ff;
+        --bg-color-hover: #e6ecf8;
+        width: 100%;
+        border: none;
+        cursor: pointer;
+        box-sizing: border-box;
         font-style: normal;
         font-weight: normal;
         line-height: normal;
-        font-size: 12px;
         text-align: center;
-        background: #edf3ff;
-        border-radius: 4px;
-        border: none;
-        padding: 8px 10px;
-        width: 100%;
-        box-sizing: border-box;
-        cursor: pointer;
+        background: var(--bg-color);
+        font-size: var(--font-size);
+        padding: var(--button-padding);
+        border-radius: var(--button-radius);
     }
 
-    .c-slot-time:hover {
-        background: #e6ecf8;
+    .slot-time:hover {
+        background: var(--bg-color-hover);
     }
 
-    .c-slot-time.unavailable {
+    .slot-time.unavailable {
         background: none;
         cursor: not-allowed;
     }
 
-    .c-slot-time.selected {
-        background: #308ff0;
-        color: #ffffff;
+    .slot-time.selected {
+        background: var(--color-blue);
+        color: var(--color-white);
         font-weight: bold;
     }
 </style>
